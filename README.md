@@ -2,7 +2,7 @@ English | [日本語](README_jp.md)
 
 # 蔵 (a database layer for Suru)
 
-A thin database layer for [Suru (「する」)](https://github.com/suru-lang/suru), a programming language in Japanese. It decides only connecting, executing, fetching rows and transactions, so the same program can use SQLite, PostgreSQL or MySQL by changing the name of one driver. It is written in Suru only and needs no C library; the drivers live in their own repositories. An O/R mapper is planned on top of it in [suru-lang/orm](https://github.com/suru-lang/orm) (plan: suru-lang/suru#164).
+A thin database layer for [Suru (「する」)](https://github.com/suru-lang/suru), a programming language in Japanese. It decides only connecting, executing, fetching rows and transactions, so the same program can use SQLite, PostgreSQL or MySQL by changing the name of one driver. It is written in Suru only and needs no C library; the drivers live in their own repositories. The O/R mapper 「台帳」 in [suru-lang/orm](https://github.com/suru-lang/orm) is built on top of it (plan: suru-lang/suru#164).
 
 ## Installing
 
@@ -15,9 +15,9 @@ kumu 追加 github.com/suru-lang/sqlite
 
 | Database | Driver | Repository |
 |---|---|---|
-| SQLite | `SQLite駆動` | [suru-lang/sqlite](https://github.com/suru-lang/sqlite) (planned for v0.2.0) |
-| PostgreSQL | `PostgreSQL駆動` | [suru-lang/postgresql](https://github.com/suru-lang/postgresql) (planned) |
-| MySQL | `MySQL駆動` | [suru-lang/mysql](https://github.com/suru-lang/mysql) (planned) |
+| SQLite | `SQLite駆動` | [suru-lang/sqlite](https://github.com/suru-lang/sqlite) v0.2.0 or later |
+| PostgreSQL | `PostgreSQL駆動` | [suru-lang/postgresql](https://github.com/suru-lang/postgresql) v0.1.0 or later |
+| MySQL | `MySQL駆動` | [suru-lang/mysql](https://github.com/suru-lang/mysql) v0.1.0 or later |
 
 ## Usage
 
