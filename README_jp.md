@@ -2,7 +2,7 @@
 
 # 蔵(する のデータベースの層)
 
-日本語のプログラミング言語「[する](https://github.com/suru-lang/suru)」の、データベースの薄い層です。決めるのは つなぐ・実行する・行を取り出す・トランザクション だけなので、駆動の名前を1つ替えるだけで、同じプログラムが SQLite・PostgreSQL・MySQL を使えます。する だけで書いてあり、C のライブラリは要りません。駆動はそれぞれのリポジトリにあります。この上に [suru-lang/orm](https://github.com/suru-lang/orm) の O/R マッパーを作る予定です(計画: suru-lang/suru#164)。
+日本語のプログラミング言語「[する](https://github.com/suru-lang/suru)」の、データベースの薄い層です。決めるのは つなぐ・実行する・行を取り出す・トランザクション だけなので、駆動の名前を1つ替えるだけで、同じプログラムが SQLite・PostgreSQL・MySQL を使えます。する だけで書いてあり、C のライブラリは要りません。駆動はそれぞれのリポジトリにあります。この上に [suru-lang/orm](https://github.com/suru-lang/orm) の O/R マッパー「台帳」があります(計画: suru-lang/suru#164)。
 
 ## 入れ方
 
@@ -15,9 +15,9 @@ kumu 追加 github.com/suru-lang/sqlite
 
 | データベース | 駆動 | リポジトリ |
 |---|---|---|
-| SQLite | `SQLite駆動` | [suru-lang/sqlite](https://github.com/suru-lang/sqlite)(v0.2.0 で入る予定) |
-| PostgreSQL | `PostgreSQL駆動` | [suru-lang/postgresql](https://github.com/suru-lang/postgresql)(予定) |
-| MySQL | `MySQL駆動` | [suru-lang/mysql](https://github.com/suru-lang/mysql)(予定) |
+| SQLite | `SQLite駆動` | [suru-lang/sqlite](https://github.com/suru-lang/sqlite) v0.2.0 から |
+| PostgreSQL | `PostgreSQL駆動` | [suru-lang/postgresql](https://github.com/suru-lang/postgresql) v0.1.0 から |
+| MySQL | `MySQL駆動` | [suru-lang/mysql](https://github.com/suru-lang/mysql) v0.1.0 から |
 
 ## 使い方
 
