@@ -67,7 +67,7 @@ PostgreSQL にするなら、`「PostgreSQL」 を 読み込んで 使う` と `
 
 ## API ドキュメント
 
-API ドキュメントは `蔵.suru` の注釈から作ります。ファイルの頭の注釈と、公開の定義のすぐ上の注釈で、英語で書いています。
+API ドキュメントは `蔵.suru` の注釈から作ります。ファイルの頭の注釈と、公開の定義のすぐ上の注釈で、英語で書いています。公開先は https://suru-lang-db.readthedocs.io/en/latest/ です。
 
 ```sh
 kumu 文書                                                            # docs/api/蔵.md を書く
