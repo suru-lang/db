@@ -65,6 +65,17 @@ PostgreSQL にするなら、`「PostgreSQL」 を 読み込んで 使う` と `
 
 関数は、駆動の関数をつないだ相手に部分適用して作ります(`（h に 低実行すること）` のように)。[試験/層.suru](試験/層.suru) に、この形で書いた偽の駆動があります。
 
+## API ドキュメント
+
+API ドキュメントは `蔵.suru` の注釈から作ります。ファイルの頭の注釈と、公開の定義のすぐ上の注釈で、英語で書いています。
+
+```sh
+kumu 文書                                                            # docs/api/蔵.md を書く
+pip install -r docs/requirements.txt && sphinx-build docs docs/_build   # docs/_build に HTML
+```
+
+`docs/` と `.readthedocs.yaml` は `kumu 文書 --雛形`(する 0.11.0 以上)で書きました。Read the Docs はビルドのたびに kumu 0.11.0 を取ってきて `kumu 文書 --出力 docs/api` を動かしてから Sphinx を動かすので、作ったページはコミットしません。エディタのホバーにも同じ説明が出ます。
+
 ## 試験
 
 ```sh
