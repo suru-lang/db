@@ -1,56 +1,48 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 sugarsweetrobotics(LICENSE)
-# 「する」のデータベースの層「蔵」(SQLite・PostgreSQL・MySQL を、駆動の名前1つで入れ替えられます)
-# kumu 追加 github.com/suru-lang/db で依存に足し、使うファイルに 「蔵」 を 読み込んで 使う と書きます(名前はどれも DB で始まります)。
-# データベースとつなぐのは駆動です。駆動は別のライブラリにあり(SQLite なら suru-lang/sqlite の SQLite駆動)、
-# 先 を 駆動 で DB開封する の 駆動 を入れ替えるだけで、ほかのところは同じに書けます。
+# 「蔵」, the database layer of Suru. SQLite, PostgreSQL and MySQL can be swapped by changing only the driver.
+# Add it with `kumu 追加 github.com/suru-lang/db` and write `「蔵」 を 読み込んで 使う` in your file. Every name starts with `DB`.
+# A driver connects to the database. Drivers are in other libraries (for SQLite, `SQLite駆動` in suru-lang/sqlite). Change only the driver in `先 を 駆動 で DB開封する`, and the rest of the code stays the same.
 #
-# データベースの値は、選択肢のある型 DB値 です。
-#   DB無                 … NULL
-#   42 の DB数           … 数(整数・小数)
-#   「a」 の DB文字列     … 文字列
-#   b の DBバイト列       … バイト列
-#   真 の DB真偽         … 真偽(SQLite のように真偽のないデータベースでは 1 と 0)
+# A database value is the type `DB値`, which has these forms:
 #
-# どれも動作です。失敗すると駆動の理由つきの実行時エラーになります(試行する で受け止められます)。
-#   先 を 駆動 で DB開封する                … つなぐ(先 は駆動ごと: SQLite ならファイルの道)
-#   db を DB閉鎖する                        … 閉じる
-#   db に 文 を DB実行する                  … 結果の行のない SQL を実行して、変わった行の数
-#   db に 文 を 値群 で DB差込実行する      … 文の「?」に値群(DB値 のリスト)を前から順に入れて実行する
-#   db に 文 を DB問合する                  … SELECT などの結果の行のリスト(1行は DB値 のリスト)
-#   db に 文 を 値群 で DB差込問合する      … 「?」に値群を入れて問い合わせる
-#   db に 文 を 値群 で DB行問合する        … 列の名前で引ける行(DB行)のリスト
-#   db を DB最終番号取得する                … 最後に INSERT した行の番号(自動採番の値)
-#   db で 処理 を DB取引する                … 処理(動作)をトランザクションの中で行う。失敗したら取り消して、同じエラーにする
-# 値を見るための純粋な関数:
-#   行 から 「名前」 を DB列取得する        … DB行 の列の値(ない名前なら実行時エラー)
-#   v を DB値文字列にする                   … 表示のための文字列(DB無 は「NULL」)
-#   v を DB数取出する・DB文字列取出する・DBバイト列取出する・DB真偽取出する … 中の値(違う形なら実行時エラー)
-#   db の DB方言値                          … データベースの違い(DB方言)
-#   名前 を 方言 で DB名囲みする            … 表や列の名前を囲む(SQLite・PostgreSQL は "名前"、MySQL は `名前`)
-#   文 を DB番号差込変換する                … 「?」を「$1」「$2」… にする(文字列と名前の囲みの中は変えない。PostgreSQL の駆動が使う)
+# - `DB無`: NULL.
+# - `42 の DB数`: a number (integer or decimal).
+# - `「a」 の DB文字列`: a string.
+# - `b の DBバイト列`: a byte sequence.
+# - `真 の DB真偽`: a truth value (1 and 0 in databases without one, such as SQLite).
 #
-# 駆動を作る人へ: DB駆動 は 名前 と 開く関数 の組です。開く関数は 先 を受け取って DB接続 を返す動作で、
-# DB接続 は データベースごとの関数(実行・問合・最終番号・閉鎖)と DB方言 を持つ組です(作り方は README の「駆動を作る」)。
+# Every function that touches the database is an action. When it fails, it is a runtime error with the driver's reason, which `試行する` can catch.
+#
+# For driver authors: `DB駆動` is a record of the name and the open function. The open function is an action that takes 先 and gives a `DB接続`, which holds the functions of the database (execute, query, last id, close) and its `DB方言` (see "Writing a driver" in the README).
 「標準」 を 読み込んで 使う
 
+# A value in the database: `DB無` (NULL), `DB数`, `DB文字列`, `DBバイト列` or `DB真偽`.
 DB値 とは DB無 か DB数値 の DB数 か DB文字値 の DB文字列 か DBバイト値 の DBバイト列 か DB真偽値 の DB真偽
 
+# The differences between databases: the name, the character that quotes names, the column types (integer, decimal, string, bytes, truth value and auto-numbered primary key), and whether INSERT … RETURNING can be used.
 DB方言 とは DB方言名 と DB名囲み字 と DB整数型 と DB小数型 と DB文字列型 と DBバイト列型 と DB真偽型 と DB主鍵型 と DB返却句可 の 組
 
+# The result of a query: the column names and the rows.
 DB問合結果 とは DB結果列名群 と DB結果行群 の 組
+# A row whose columns can be looked up by name with `DB列取得する`: the column names and the values.
 DB行 とは DB行列名群 と DB行値群 の 組
 
+# An open database: the functions of the driver (execute, query, last id and close) and `DB方言値`, the dialect of the database.
 DB接続 とは DB実行口 と DB問合口 と DB最終番号口 と DB閉鎖口 と DB方言値 の 組
+# A driver: its name and the function that opens a connection.
 DB駆動 とは DB駆動名 と DB開口 の 組
 
 # --- 方言 ---
 
-# 方言の名前・名前を囲む字・列の型(整数・小数・文字列・バイト列・真偽・自動採番の主鍵)・INSERT … RETURNING を使えるか
+# The dialect of SQLite: names quoted with 「"」, no truth value type, no RETURNING.
 DBSQLite方言 とは 「SQLite」 と 「"」 と 「INTEGER」 と 「REAL」 と 「TEXT」 と 「BLOB」 と 「INTEGER」 と 「INTEGER PRIMARY KEY」 と 偽 の DB方言
+# The dialect of PostgreSQL: names quoted with 「"」, BOOLEAN, BIGSERIAL keys and RETURNING.
 DBPostgreSQL方言 とは 「PostgreSQL」 と 「"」 と 「BIGINT」 と 「DOUBLE PRECISION」 と 「TEXT」 と 「BYTEA」 と 「BOOLEAN」 と 「BIGSERIAL PRIMARY KEY」 と 真 の DB方言
+# The dialect of MySQL: names quoted with 「`」, BOOLEAN, AUTO_INCREMENT keys, no RETURNING.
 DBMySQL方言 とは 「MySQL」 と 「`」 と 「BIGINT」 と 「DOUBLE」 と 「TEXT」 と 「LONGBLOB」 と 「BOOLEAN」 と 「BIGINT AUTO_INCREMENT PRIMARY KEY」 と 偽 の DB方言
 
+# The table or column name quoted for the dialect (`"名前"` for SQLite and PostgreSQL, a backquoted name for MySQL).
 文字列 を DB方言 で DB名囲みする は 文字列
 名 を 方言 で DB名囲みする とは
   q とは 方言 の DB名囲み字
@@ -58,17 +50,21 @@ DBMySQL方言 とは 「MySQL」 と 「`」 と 「BIGINT」 と 「DOUBLE」 �
 
 # --- 「?」を「$1」「$2」… にする(PostgreSQL) ---
 
+# Used inside the library: the state of `DB番号差込変換する`.
 DB変換状態 とは DB変換出 と DB変換番 と DB変換内 の 組
 
+# The statement with its 「?」 placeholders changed to 「$1」, 「$2」 and so on. Strings and quoted names are left alone. The PostgreSQL driver uses it.
 文字列 を DB番号差込変換する は 文字列
 文 を DB番号差込変換する とは
   終 とは （文 を 文字分解する） を （空 と 1 と 「」 の DB変換状態） から （s と c を 受け取って c を s で 一字変換する を 返すこと） で 畳み込みする
   （終 の DB変換出） を 逆順にして 「」 で 結合する
 
+# Used inside the library: one character of `DB番号差込変換する`.
 文字列 を DB変換状態 で 一字変換する は DB変換状態
 c を s で 一字変換する とは
   もし s の DB変換内 = 「」 ならば c を s で 外一字変換する そうでなければ c を s で 内一字変換する
 
+# Used inside the library: one character outside strings and quoted names.
 文字列 を DB変換状態 で 外一字変換する は DB変換状態
 c を s で 外一字変換する とは
   出 とは s の DB変換出
@@ -77,6 +73,7 @@ c を s で 外一字変換する とは
   そうでなければ もし c = 「'」 または c = 「"」 または c = 「`」 ならば （c を 出 に 挿入する） と 番 と c の DB変換状態
   そうでなければ （c を 出 に 挿入する） と 番 と 「」 の DB変換状態
 
+# Used inside the library: one character inside a string or a quoted name.
 文字列 を DB変換状態 で 内一字変換する は DB変換状態
 c を s で 内一字変換する とは
   出 とは c を （s の DB変換出） に 挿入する
@@ -84,51 +81,63 @@ c を s で 内一字変換する とは
 
 # --- つなぐ・閉じる ---
 
+# Connects to the database 先 with the driver (先 depends on the driver; for SQLite it is the path of the file).
 文字列 を DB駆動 で DB開封する は DB接続 を 返す 入出力動作
 先 を 駆動 で DB開封する とは
   開く とは 駆動 の DB開口
   先 を 開くする
 
+# Closes the connection.
 DB接続 を DB閉鎖する は 数 を 返す 入出力動作
 db を DB閉鎖する とは db の DB閉鎖口
 
 # --- 実行と問い合わせ ---
 
+# Runs the statement with the values (a list of `DB値`) put into its 「?」 placeholders in order, and gives the number of changed rows.
 DB接続 に 文字列 を DB値 の リスト で DB差込実行する は 数 を 返す 入出力動作
 db に 文 を 値群 で DB差込実行する とは
   実行 とは db の DB実行口
   文 を 値群 で 実行する
 
+# Runs SQL that returns no rows and gives the number of changed rows.
 DB接続 に 文字列 を DB実行する は 数 を 返す 入出力動作
 db に 文 を DB実行する とは db に 文 を 空 で DB差込実行する
 
+# Runs a query with the values put into its 「?」 placeholders, and gives the column names and the rows.
 DB接続 に 文字列 を DB値 の リスト で DB表問合する は DB問合結果 を 返す 入出力動作
 db に 文 を 値群 で DB表問合する とは
   問合 とは db の DB問合口
   文 を 値群 で 問合する
 
+# Runs a query with the values put into its 「?」 placeholders, and gives the rows (each row is a list of `DB値`).
 DB接続 に 文字列 を DB値 の リスト で DB差込問合する は DB値 の リスト の リスト を 返す 入出力動作
 db に 文 を 値群 で DB差込問合する とは （db に 文 を 値群 で DB表問合する） を （r を 受け取って r の DB結果行群 を 返すこと） で 写像する
 
+# The rows of a query such as SELECT (each row is a list of `DB値`).
 DB接続 に 文字列 を DB問合する は DB値 の リスト の リスト を 返す 入出力動作
 db に 文 を DB問合する とは db に 文 を 空 で DB差込問合する
 
+# Runs a query with the values put into its 「?」 placeholders, and gives rows whose columns can be looked up by name (`DB行`).
 DB接続 に 文字列 を DB値 の リスト で DB行問合する は DB行 の リスト を 返す 入出力動作
 db に 文 を 値群 で DB行問合する とは （db に 文 を 値群 で DB表問合する） を 行群にすること で 写像する
 
+# The rows of a query result as `DB行`.
 DB問合結果 を 行群にする は DB行 の リスト
 r を 行群にする とは
   名群 とは r の DB結果列名群
   （r の DB結果行群） を （値群 を 受け取って 名群 と 値群 の DB行 を 返すこと） で 写像する
 
+# The id of the last row inserted (the auto-numbered value).
 DB接続 を DB最終番号取得する は 数 を 返す 入出力動作
 db を DB最終番号取得する とは db の DB最終番号口
 
 # --- 列の名前で引く ---
 
+# The value of the column 名 in the row. A name that is not there is a runtime error.
 DB行 から 文字列 を DB列取得する は DB値
 行 から 名 を DB列取得する とは 名 を （行 の DB行列名群） と （行 の DB行値群） で 列探索する
 
+# Used inside the library: the value for 名 in the column names and values.
 文字列 を 文字列 の リスト と DB値 の リスト で 列探索する は DB値
 名 を 名群 と 値群 で 列探索する とは
   もし 名群 が
@@ -137,6 +146,7 @@ DB行 から 文字列 を DB列取得する は DB値
 
 # --- 値 ---
 
+# A string for showing the value (「NULL」 for `DB無`).
 DB値 を DB値文字列にする は 文字列
 DB無 を DB値文字列にする とは 「NULL」
 （n の DB数） を DB値文字列にする とは n を 文字列化する
@@ -144,22 +154,26 @@ DB無 を DB値文字列にする とは 「NULL」
 （b の DBバイト列） を DB値文字列にする とは 「バイト列(」 + （b を バイト長にして 文字列化する） + 「バイト)」
 （v の DB真偽） を DB値文字列にする とは もし v ならば 「真」 そうでなければ 「偽」
 
+# Used inside the library: the runtime error for a value that is not of the expected form.
 DB値 を 文字列 で 形違中断する は 甲
 v を 期待 で 形違中断する とは （「DB の値が」 + 期待 + 「ではありません(」 + （v を DB値文字列にする） + 「)」） を 中断する
 
+# The number in the value. Another form is a runtime error.
 DB値 を DB数取出する は 数
 （n の DB数） を DB数取出する とは n
 v を DB数取出する とは v を 「数」 で 形違中断する
 
+# The string in the value. Another form is a runtime error.
 DB値 を DB文字列取出する は 文字列
 （s の DB文字列） を DB文字列取出する とは s
 v を DB文字列取出する とは v を 「文字列」 で 形違中断する
 
+# The bytes in the value. Another form is a runtime error.
 DB値 を DBバイト列取出する は バイト列
 （b の DBバイト列） を DBバイト列取出する とは b
 v を DBバイト列取出する とは v を 「バイト列」 で 形違中断する
 
-# 真偽のないデータベース(SQLite・MySQL)から読んだ 1 と 0 も真偽にする
+# The truth value in the value. 1 and 0 read from databases without truth values (SQLite and MySQL) count too. Another form is a runtime error.
 DB値 を DB真偽取出する は 真偽
 （v の DB真偽） を DB真偽取出する とは v
 （n の DB数） を DB真偽取出する とは n ≠ 0
@@ -167,23 +181,27 @@ v を DB真偽取出する とは v を 「真偽」 で 形違中断する
 
 # --- トランザクション ---
 
+# Runs 処理 (an action) in a transaction. When it fails, the transaction is rolled back and the same error is raised.
 DB接続 で 甲 の 動作 を DB取引する は 甲 を 返す 入出力動作
 db で 処理 を DB取引する とは 入出力手順
   db に 「BEGIN」 を DB実行する
   r とは 処理 を 試行した 結果
   db で r を 取引終了する
 
+# Used inside the library: commits or rolls back the transaction, depending on the result.
 DB接続 で （甲 と 文字列） の 成否 を 取引終了する は 甲 を 返す 入出力動作
 db で r を 取引終了する とは
   もし r が
     v の 成功 ならば db で v を 確定返却する
     e の 失敗 ならば db で e を 取消失敗する
 
+# Used inside the library: commits the transaction and gives the value.
 DB接続 で 甲 を 確定返却する は 甲 を 返す 入出力動作
 db で v を 確定返却する とは 入出力手順
   db に 「COMMIT」 を DB実行する
   v を 結果にする
 
+# Used inside the library: rolls back the transaction and fails with the error.
 DB接続 で 文字列 を 取消失敗する は 甲 を 返す 入出力動作
 db で e を 取消失敗する とは 入出力手順
   db に 「ROLLBACK」 を DB実行する

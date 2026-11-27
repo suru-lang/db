@@ -65,6 +65,17 @@ A driver is `名前 と 開く関数 の DB駆動`. The opening function takes `
 
 Make the functions by partially applying the driver's own functions to its handle, as in `（h に 低実行すること）`. [試験/層.suru](試験/層.suru) has a fake driver written this way.
 
+## API documentation
+
+The API documentation is made from the comments in `蔵.suru`: the head comment of the file and the comment right above each public definition, written in English.
+
+```sh
+kumu 文書                                                            # writes docs/api/蔵.md
+pip install -r docs/requirements.txt && sphinx-build docs docs/_build   # HTML in docs/_build
+```
+
+`docs/` and `.readthedocs.yaml` were written by `kumu 文書 --雛形` (Suru 0.11.0 or later). On every build, Read the Docs downloads kumu 0.11.0, runs `kumu 文書 --出力 docs/api` and then Sphinx, so the generated pages are not committed. The editor hover shows the same descriptions.
+
 ## Tests
 
 ```sh
